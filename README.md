@@ -1,81 +1,73 @@
-# Digital Family Tree
+# Family Tree 👨‍👩‍👧‍👦
 
-A modern web application for creating and managing family trees digitally. Built with Next.js, React Flow, and Clerk authentication.
+A modern web application for visualizing and managing a Chinese-style **族谱 (Zupu)** — a digital family genealogy record. Inspired by traditional family practices, this tool allows remote family members to collaboratively update and maintain their shared lineage.
 
 ## Features
 
-- Interactive family tree visualization
-- User authentication and authorization
-- Real-time updates
-- Responsive design
-- PostgreSQL database with Prisma ORM
+- 📜 Digitized multi-generational family tree visualization
+- 🌐 Accessible remotely — ideal for families spread across regions
+- 🧑‍🤝‍🧑 Add, edit, or delete members and relationships
+- 🔐 Authentication and role-based access (viewer/editor/admin)
+- 🖨️ [Planned] Export printable PDF of family tree (Zupu)
 
 ## Tech Stack
 
-- **Frontend**: Next.js + Tailwind CSS + React Flow
-- **Backend**: Next.js API Routes
-- **Database**: PostgreSQL via Prisma ORM
-- **Auth**: Clerk.dev
-- **Hosting**: Vercel + Railway/Supabase
+- **Frontend**: Next.js, Tailwind CSS, React Flow
+- **Backend**: Prisma ORM + Supabase (PostgreSQL)
+- **Auth**: Clerk (or Supabase Auth alternative)
+- **Deployment**: Vercel
 
 ## Getting Started
 
-1. Clone the repository
-2. Install dependencies:
+### 1. Clone and install dependencies
 
-   ```bash
-   npm install
-   ```
-
-3. Set up environment variables:
-   Create a `.env` file with the following variables:
-
-   ```
-   DATABASE_URL="postgresql://user:password@localhost:5432/digital_family_tree"
-   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="your_publishable_key"
-   CLERK_SECRET_KEY="your_secret_key"
-   ```
-
-4. Set up the database:
-
-   ```bash
-   npx prisma generate
-   npx prisma migrate dev
-   ```
-
-5. Run the development server:
-
-   ```bash
-   npm run dev
-   ```
-
-6. Open [http://localhost:3000](http://localhost:3000) in your browser
-
-## Project Structure
-
-```
-digital-family-tree/
-├── prisma/
-│   └── schema.prisma         # DB schema
-├── src/
-│   ├── app/                  # Next.js app directory
-│   │   ├── api/             # API routes
-│   │   ├── dashboard/       # Dashboard page
-│   │   └── page.tsx         # Home page
-│   ├── components/          # React components
-│   └── lib/                 # Utility functions
-├── public/                  # Static assets
-└── .env                     # Environment variables
+```bash
+git clone https://github.com/cufesimonwang/family-tree.git
+cd family-tree
+npm install
 ```
 
-## Contributing
+### 2. Configure environment variables
 
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a new Pull Request
+Copy the example config and fill in your values:
+
+```bash
+cp .env.example .env
+```
+
+Make sure to set:
+
+- `DATABASE_URL` (from Supabase)
+- `NEXT_PUBLIC_CLERK_FRONTEND_API` and `CLERK_SECRET_KEY` (from Clerk dashboard)
+
+### 3. Initialize the database
+
+```bash
+npx prisma generate
+npx prisma migrate dev --name init
+```
+
+### 4. Run the development server
+
+```bash
+npm run dev
+```
+
+Visit [http://localhost:3000](http://localhost:3000) to view the app.
+
+---
+
+## Roadmap
+
+- [x] Backend setup with Prisma + Supabase
+- [x] Graph visualization using React Flow
+- [ ] Add member UI + forms
+- [ ] Auth-gated dashboard with roles
+- [ ] Export family tree to printable PDF
+- [ ] Mobile-friendly layout
+
+---
 
 ## License
 
-This project is licensed under the MIT License.
+This project is currently under development by [@cufesimonwang](https://github.com/cufesimonwang). Feel free to fork or suggest contributions!
