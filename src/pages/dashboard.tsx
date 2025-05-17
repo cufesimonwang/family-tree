@@ -3,9 +3,13 @@ import { prisma } from "@/lib/prisma";
 import FamilyTree from "@/components/FamilyTree";
 import { Node, Edge } from "reactflow";
 import { getAuth } from "@clerk/nextjs/server";
-import UserMenu from "@/components/UserMenu";
+import { UserButton } from "@clerk/nextjs";
 import InviteForm from "@/components/InviteForm";
 import EditMemberForm from "@/components/EditMemberForm";
+import { useUser } from "@clerk/nextjs";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 type Member = Awaited<ReturnType<typeof prisma.member.findFirst>>;
 type StrictMember = NonNullable<Member>;
@@ -18,7 +22,6 @@ type Props = {
 export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
   const { userId } = getAuth(ctx.req);
 
-  // 🚫 Step 1: Not logged in → redirect to sign-in
   if (!userId) {
     return {
       redirect: {
@@ -28,7 +31,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
     };
   }
 
-  // ✅ Step 2: Check user in DB for role
   const user = await prisma.user.findUnique({ where: { id: userId } });
 
   if (!user || (user.role !== "editor" && user.role !== "admin")) {
@@ -37,7 +39,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
     };
   }
 
-  // ✅ Step 3: Load members
   const members: StrictMember[] = await prisma.member.findMany();
 
   const nodes: Node[] = members.map((m, i) => ({
@@ -56,6 +57,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
 
   return {
     props: {
+      ...(await serverSideTranslations(ctx.locale ?? "en", ["common"])),
       nodes,
       edges,
     },
@@ -63,10 +65,26 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
 };
 
 export default function Dashboard({ nodes, edges }: Props) {
+  const { user } = useUser();
+  const { t } = useTranslation("common");
+
   return (
     <main className="p-4">
-      <UserMenu />
-      <h1 className="text-xl font-bold mb-4">Family Tree</h1>
+      <div className="flex justify-between items-center mb-4">
+        <div>
+          <h1 className="text-xl font-bold">{t("familyTree")}</h1>
+          {user && (
+            <p className="text-sm text-gray-600">
+              {t("welcomeUser", { name: user.firstName })}
+            </p>
+          )}
+        </div>
+        <div className="flex items-center space-x-4">
+          <LanguageSwitcher />
+          <UserButton afterSignOutUrl="/" />
+        </div>
+      </div>
+
       <InviteForm />
       <EditMemberForm />
       <FamilyTree nodes={nodes} edges={edges} />

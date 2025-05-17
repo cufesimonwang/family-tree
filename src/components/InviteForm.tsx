@@ -1,12 +1,14 @@
 "use client";
 import { useState } from "react";
+import { useTranslation } from "next-i18next";
 
 export default function InviteForm() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("");
+  const { t } = useTranslation("common");
 
   const handleInvite = async () => {
-    const url = `http://localhost:3000/sign-up?redirect_url=/dashboard`; 
+    const url = `http://localhost:3000/sign-up?redirect_url=/dashboard`;
 
     try {
       await fetch("/api/invite", {
@@ -14,20 +16,20 @@ export default function InviteForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, url }),
       });
-      setStatus("Invite link sent!");
+      setStatus(t("inviteSent"));
     } catch (err) {
-      setStatus("Error sending invite.");
+      setStatus(t("inviteError"));
     }
   };
 
   return (
     <div className="mb-6">
-      <h2 className="text-lg font-semibold mb-2">Invite a Family Member</h2>
+      <h2 className="text-lg font-semibold mb-2">{t("inviteMember")}</h2>
       <div className="flex gap-2">
         <input
           className="border rounded px-2 py-1"
           type="email"
-          placeholder="user@example.com"
+          placeholder={t("emailPlaceholder")}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
@@ -35,7 +37,7 @@ export default function InviteForm() {
           className="bg-blue-600 text-white px-3 py-1 rounded"
           onClick={handleInvite}
         >
-          Invite
+          {t("invite")}
         </button>
       </div>
       {status && <p className="text-sm mt-2">{status}</p>}
