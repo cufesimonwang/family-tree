@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // This will be set later
+}
+
+model User {
+  id        String   @id @default(cuid()) // Clerk ID will be used, but Prisma needs an id
+  clerkId   String   @unique // To store the Clerk User ID
+  email     String   @unique
+  role      Role     @default(viewer)
+  members   Member[] @relation("CreatedBy")
+  invites   Invite[] @relation("InvitedBy")
+}
+
+model Member {
+  id        String   @id @default(cuid())
+  name      String
+  gender    Gender   @default(unknown)
+  parentId  String?
+  // Self-relation for parent-child
+  parent    Member?  @relation("Children", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children  Member[] @relation("Children")
+  createdBy User     @relation("CreatedBy", fields: [createdById], references: [id])
+  createdById String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Invite {
+  id          String   @id @default(cuid())
+  email       String   @unique // Email of the person being invited
+  invitedBy   User     @relation("InvitedBy", fields: [invitedById], references: [id])
+  invitedById String
+  acceptedAt  DateTime?
+  createdAt   DateTime @default(now())
+}
+
+enum Role {
+  viewer
+  editor
+  admin
+}
+
+enum Gender {
+  male
+  female
+  unknown
+}
